@@ -4,7 +4,7 @@ This file lists all the individual Lua functions, be they `onFilter` and `onGrou
 
 # Helper Functions
 
-This section lists all those functions that help make understanding Simpletask (ST) easier. They are useful in understanding the input fields for in-built functions available from ST, which are listed on: https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/script.en.md. They can also be used to understand some lua function return values as well.
+This section lists all those functions that help make understanding Simpletask (ST) easier. They are useful in understanding the input fields for in-built functions available from ST, which are listed [here](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/script.en.md). They can also be used to understand some lua function return values as well.
 
 
 ```lua
