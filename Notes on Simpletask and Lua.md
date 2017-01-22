@@ -71,5 +71,5 @@ A.1 = 3         -- equivalent to A("1") = 3
 if A.c == nil   -- equivalent to if A("c") == nil
 ```
 
-Lastly, also note that the value assigned to a key can be a table too. (We'll see how this is all relevant to Simpletask in the following section.
+Lastly, also note that the value assigned to a key can be a table too. (We'll see how this is all relevant to Simpletask in the following section.)
 
