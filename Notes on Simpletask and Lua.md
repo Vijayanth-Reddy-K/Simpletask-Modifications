@@ -14,7 +14,7 @@ The [Lua Help Manual](https://www.lua.org/manual/5.3/) defines a table as follow
 >
 > Like indices, the values of table fields can be of any type. In particular, because functions are first-class values, table fields can contain functions. Thus tables can also carry methods.
 
-That is, unlike MATLAB, where an array `A` can only have numerical indices, in lua, arrays can have any index, string or number. So, for instance, these are all valid assignments:
+That is, unlike MATLAB, where an array can only have numerical indices, in lua, tables can have any index - string or number. A table can be thought of as a combination of a structure and a cell array from Matlab. So, for instance, these are all valid assignments:
 
 ```lua
 A = {}        -- Empty Table
@@ -39,7 +39,7 @@ As mentioned earlier,
 
 > Any key with value **nil** is not considered part of the table. Conversely, any key that is not part of a table has an associated value **nil**.
 
-Thus, to delete a value assigned to a key, simply assign it to **nil**. Thus, implementing this code:
+Thus, to delete a value assigned to a key, simply assign it to `nil`. Thus, implementing this code:
 
 ```lua
 A("a") = nil
@@ -47,13 +47,15 @@ A("a") = nil
 
 will reduce the number of elements in table `A` to 4.
 
-Also, if you wish to check whether or not a particular key is associated with a table, check whether or not it is equal to **nil**. For instance,
+Also, if you wish to check whether or not a particular key is associated with a table, check whether or not it is equal to `nil`. For instance,
 
 ```lua
-if A("b") == nil
+if A("b") == nil then
+    -- code
+end
 ```
 
-will not enter the `if` loop.
+will not enter the `if` loop and run the code block.
 
 As also mentioned earlier, from the Lua Help manual,
 
@@ -71,7 +73,9 @@ A.1 = 3         -- equivalent to A("1") = 3
 if A.c == nil   -- equivalent to if A("c") == nil
 ```
 
-Lastly, also note that the value assigned to a key can be a table too. (We'll see how this is all relevant to Simpletask in the following section.)
+Thus, unlike object oriented languages, `M.n` **_does not_** represent a variable or method `n` of object `M`.
+
+Lastly, also note that nested tables are possible, that is, the value assigned to a key can be a table too. (We'll see how this is all relevant to Simpletask in the following section.)
 
 
 # Understanding Simpletask Lua Callback Function Arguments and Parameters
@@ -86,7 +90,7 @@ Every task in Simpletask has an associated table which is passed to the `onFilte
 
 As the [Simpletask Lua Configuration Help File](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/script.en.md#onfilter-task-fields-extensions---boolean) states, the parameter `fields` has further parameters such as `completed`, `completiondate`, `createdate`, `due`, etc.
 
-What is not explicitly mentioned is that all of these parameters are *keys* for the table referenced now by `f` (for brevity, henceforth, this will be called table `f`). The values corresponding to these keys could be assigned their respective types, or be `nil`. Thus, if no threshld date has been set for a particular task, for example, the table field addressed by the key `"thresholddate"` will be `nil`.
+What is not explicitly mentioned is that all of these parameters are *keys* for the table referenced now by `f` (for brevity, henceforth, this will be called table `f`). The values corresponding to these keys could be assigned their respective types, or be `nil`. Thus, if no threshold date has been set for a particular task, for example, the table field value addressed by the key `"thresholddate"` will be `nil`.
 
 All the keys of table `f` barring `"lists"` and `"tags"` have single values. Thus, if you wish to check or return the values, you use:
 
@@ -95,7 +99,7 @@ return f.completed
 
 -- or
 
-if f.due == nil
+if f.due == nil then
 ```
 
 (Note that as described in the preceeding section, instead of `f.due`, etc., you could also use `f["due"]`, etc. without affecting the outcome of the function.)
@@ -118,7 +122,7 @@ return f.lists["List_Name"]
 
 -- or
 
-if f.tags["Tag_Name"] == false
+if f.tags["Tag_Name"] == false then
 ```
 
 This is why, in the help page, for a **tag** "@errands" (i.e. the task will have a term `+@errands` in it), the following example is given:
@@ -131,7 +135,7 @@ function onFilter(t,f,e)
 end
 ```
 
-The `extensions` argument (`e` in the function calls) is also a table with some custom Simpletask specific terms (such as due and threshold dates as strings, and recurrence behaviour) as keys, and corresponding custom values. If, instead of checking for the existence of individual tags or lists, you wish to list or concatenate all the lists or tags, the code for doing so can be found [here](https://github.com/Vijayanth-Reddy-K/Simpletask-Modifications/blob/Add-Code/Individual%20Functions%20for%20Filtering%20and%20Grouping.md#understanding-tables-generated-by-simpletask).
+The `extensions` argument (`e` in the function calls) is also a table with some custom Simpletask specific terms (such as due and threshold date strings, and recurrence behaviour) as values, and corresponding custom keys referencing these values. If, instead of checking for the existence of individual tags or lists, you wish to list or concatenate all the lists or tags, the code for doing so can be found [here](https://github.com/Vijayanth-Reddy-K/Simpletask-Modifications/blob/Add-Code/Individual%20Functions%20for%20Filtering%20and%20Grouping.md#understanding-tables-generated-by-simpletask).
 
 Note that if you wish to filter by lists or tags and also perform some additional functions, you can combine lua scripts with the in-built filters. (For more details, see [Tips](Tips.md))
 
