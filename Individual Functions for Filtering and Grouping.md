@@ -43,7 +43,7 @@ Similarly, if you wish to know exactly what due date ranges, and hence, tasks, w
 ```lua
 function onGroup(t, f, e)
     
-    tim=os.time()
+    tim = os.time()
     tim_d = tim-86400
     tim_w = tim+518400
     tim_m = tim+2505600 
