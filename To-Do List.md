@@ -1,4 +1,4 @@
 - [x] Finish Notes on Lua and ST
-- [ ] Finish Tips
+- [x] Finish Tips
 - [ ] Create saved filters
 - [ ] Update issues
