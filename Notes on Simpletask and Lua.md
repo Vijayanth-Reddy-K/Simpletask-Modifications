@@ -57,7 +57,7 @@ will not enter the `if` loop.
 
 As also mentioned earlier, from the Lua Help manual,
 
-> a.name as syntactic sugar for a["name"]
+> a.name is syntactic sugar for a["name"]
 
 What this means is in the code above, if the index/key were a string, a different syntax could be used.
 
@@ -73,3 +73,21 @@ if A.c == nil   -- equivalent to if A("c") == nil
 
 Lastly, also note that the value assigned to a key can be a table too. (We'll see how this is all relevant to Simpletask in the following section.)
 
+
+# Understanding Simpletask Lua Callback Function Arguments and Parameters
+
+Syntax:
+- `onFilter (task, fields, extensions)`, eg. `function onFilter(t, f, e)`
+- `onGroup (task, fields, extensions)`, eg. `function onGroup(t, f, e)`
+
+### The `fields` argument
+
+Every task in Simpletask has an associated table which is passed to the `onFilter` or `onGroup` functions as the argument `fields`. Thus, when you define `function onFilter(t, f, e)`, when each task is checked, the reference to this table (associated with the particular task) is assigned to `f`.
+
+
+
+
+
+
+
+https://github.com/Vijayanth-Reddy-K/Simpletask-Modifications/blob/Add-Code/Individual%20Functions%20for%20Filtering%20and%20Grouping.md#understanding-tables-generated-by-simpletask
