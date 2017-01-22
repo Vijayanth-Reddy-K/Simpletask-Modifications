@@ -84,10 +84,73 @@ Syntax:
 
 Every task in Simpletask has an associated table which is passed to the `onFilter` or `onGroup` functions as the argument `fields`. Thus, when you define `function onFilter(t, f, e)`, when each task is checked, the reference to this table (associated with the particular task) is assigned to `f`.
 
+As the [Simpletask Lua Configuration Help File](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/script.en.md#onfilter-task-fields-extensions---boolean) states, the parameter `fields` has further parameters such as `completed`, `completiondate`, `createdate`, `due`, etc.
 
+What is not explicitly mentioned is that all of these parameters are *keys* for the table referenced now by `f` (for brevity, henceforth, this will be called table `f`). The values corresponding to these keys could be assigned their respective types, or be `nil`. Thus, if no threshld date has been set for a particular task, for example, the table field addressed by the key `"thresholddate"` will be `nil`.
 
+All the keys of table `f` barring `"lists"` and `"tags"` have single values. Thus, if you wish to check or return the values, you use:
 
+```lua
+return f.completed
 
+-- or
 
+if f.due == nil
+```
 
-https://github.com/Vijayanth-Reddy-K/Simpletask-Modifications/blob/Add-Code/Individual%20Functions%20for%20Filtering%20and%20Grouping.md#understanding-tables-generated-by-simpletask
+(Note that as described in the preceeding section, instead of `f.due`, etc., you could also use `f["due"]`, etc. without affecting the outcome of the function.)
+
+In the case of keys `"lists"` and `"tags"`, the values are tables. Taking `lists`, for instance, `f.lists` returns a table where the keys are the lists of the task. And the values are `true`.
+
+That is, for a task: `Test task @Test @@Understand`, `f.lists` is a table where:
+
+```lua
+f.lists["Test"] = true          -- The first "@" is supressed.
+f.lists["@Understand"] = true
+```
+
+The first list can be acceessed even by `f.lists.Test`. But because the second list starts with a "@", `f.lists.@Understanding` throws an error, while the explicit key declaration `f.lists["@Understand"]` still works. And if a task does not belong to the "@Test" list, `f.lists.Test` will have a value `false`.
+
+Similarly for tags. Thus, you can filter for tasks of a particular list (or tag) by using:
+
+```lua
+return f.lists["List_Name"]
+
+-- or
+
+if f.tags["Tag_Name"] == false
+```
+
+This is why, in the help page, for a **tag** "@errands" (i.e. the task will have a term `+@errands` in it), the following example is given:
+
+```lua
+-- Show all tasks with the @errands tag:
+
+function onFilter(t,f,e)
+   return f.tags["@errands"]
+end
+```
+
+The `extensions` argument (`e` in the function calls) is also a table with some custom Simpletask specific terms (such as due and threshold dates as strings, and recurrence behaviour) as keys, and corresponding custom values. If, instead of checking for the existence of individual tags or lists, you wish to list or concatenate all the lists or tags, the code for doing so can be found [here](https://github.com/Vijayanth-Reddy-K/Simpletask-Modifications/blob/Add-Code/Individual%20Functions%20for%20Filtering%20and%20Grouping.md#understanding-tables-generated-by-simpletask).
+
+Note that if you wish to filter by lists or tags and also perform some additional functions, you can combine lua scripts with the in-built filters. (For more details, see [Tips](Tips.md))
+
+# Appendix
+
+Finally, as an aside, one last additional bit of code (which I do not use, but if needed, here it is). Based on the discussion above and in the [Individual Functions for Filtering and Grouping](Individual Functions for Filtering and Grouping.md) file, if you wish to access the string due or threshold dates (for example, as 2016-12-22 and not as seconds, which is what `f.due` or `f.threshold` return), there are two ways to do so. (Substutute `threshold` instead of `due` for threshold date in the code below.)
+
+```lua
+-- Return due date as string. Implemented here in the onGroup function. Can easily be modified for onFilter as well.
+
+function onGroup(t, f, e)
+    return e.due
+end
+
+-- OR
+
+function onGroup(t, f, e)
+    return os.date("%Y-%m-%d", f.due)
+end
+```
+
+(The second method can be used to return creation date as well, if desired. Also, the date (and time) can be formatted as needed with the second method. More details about formatting the time string can be found [here](https://www.lua.org/pil/22.1.html).)
