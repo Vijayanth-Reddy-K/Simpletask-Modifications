@@ -7,7 +7,7 @@ This file lists all the individual Lua functions, be they `onFilter` and `onGrou
 This section lists all those functions that help make understanding Simpletask (ST) easier. They are useful in understanding the input fields for in-built functions available from ST, which are listed on: https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/script.en.md. They can also be used to understand some lua function return values as well.
 
 
-```
+```lua
 -- General Syntax:
 
 function onGroup(t, f, e)
@@ -19,7 +19,7 @@ end
 
 This generic tool will then group all tasks according to the return value, which will be the parameter in question. For example, if you wish to know what `f.due` is, simply use:
 
-```
+```lua
 function onGroup(t, f, e)
     return f.due
 end
@@ -29,7 +29,7 @@ This will group the tasks according to the internal representation of the due da
 
 Some examples use `os.time()`. To understand what `os.time()` returns, instead of `f.due`, use `os.time()` in the above example. And to know exactly what the due or threshold or creation dates and times are for the corresponding internal representations stored in `f.due`, etc., use:
 
-```
+```lua
 function onGroup(t, f, e)
     tim = f.due     --or os.time(), f.threshold, etc.
     return os.date("%c", tim)
@@ -40,7 +40,7 @@ Doing this will show that all due and threshold dates exceed `os.time()` at 00:0
 
 Similarly, if you wish to know exactly what due date ranges, and hence, tasks, will be covered by my time bound filters (listed subsequently), use:
 
-```
+```lua
 function onGroup(t, f, e)
     
     tim=os.time()
@@ -61,7 +61,7 @@ If you are testing with a todo list of few tasks, or just testing on a single ta
 For example, with a test task `(A) 2016-12-15 This is an example task with all features. @Testing @@Understanding_ST +Helper t:2016-12-15 due:2016-12-22`, running:
 
 
-```
+```lua
 function onFilter(t, f, e)
     
     for k, v in pairs(f.lists) do 
@@ -81,7 +81,7 @@ Similarly, replacing `f.lists` in `for k, v in pairs(f.lists) do` with `f.tags` 
 
 This is the Lua Config file I have at present. The functions defined are heavily commented, so no separate descriptions are provided.
 
-```
+```lua
 toast('Hello')    -- Welcome message. Runs every time Simpletask starts or the lua configuration script is run.
 
 ---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
@@ -239,7 +239,7 @@ Once the above code is successfully imported and run (import it twice, if you ar
 
 ### Show only not-completed tasks
 
-```
+```lua
 function onFilter(t, f, e)
     return not f.completed
 end
@@ -253,7 +253,7 @@ end
 
 ### Show only completed tasks
 
-```
+```lua
 function onFilter(t, f, e)
     return f.completed
 end
@@ -267,7 +267,7 @@ end
 
 ### Group tasks by list or tag, even those with multiple of them in a single task. Such tasks are classified separately.
 
-```
+```lua
 -- Group by lists
 
 function onGroup(t, f, e)
@@ -284,7 +284,7 @@ end
 
 ### Filter uncompleted tasks by due date
 
-```
+```lua
 -- Filter by due date: Overdue
 
 function onFilter(t, f, e)
@@ -324,7 +324,7 @@ end
 
 If you sort by due date first, this results in something similar to the Any.Do layout, only, a lot more flexible, as you can define your own categories. If used in conjunction with one of the filter functions from the preceeding section, they would provide a header to the filter when opened in the main window.
 
-```
+```lua
 function onFilter(t, f, e)
     return group_uncompleted_by_due_date(t, f, e)
 end
