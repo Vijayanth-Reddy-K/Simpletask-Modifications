@@ -1,6 +1,6 @@
 # Introduction
 
-The lua callback functions of `onFilter` and `onGroup` allow, as arguments, the `fields` and `extensions` arguments, generally condensed to `f` and `e` respectively when writing the funtion. For every `f`, a certain number of terms are further defined.
+The lua callback functions of `onFilter` and `onGroup` allow, as arguments, the `fields` and `extensions` arguments, generally condensed to `f` and `e` respectively when calling the funtion. For every `f`, a certain number of terms are further defined.
 
 Simpletask help assumes a working knowledge of the lexicon and terminology of Lua, and so, does not go beyond stating that `fields` and `extensions` are tables. This writeup aims to explore what exactly is meant by that and some of the other notations that (I felt) needed further explanation.
 
