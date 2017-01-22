@@ -70,7 +70,7 @@ A.a = 5         -- equivalent to A("a") = 5
 A.b = 4         -- equivalent to A("b") = 4
 A.1 = 3         -- equivalent to A("1") = 3
 
-if A.c == nil   -- equivalent to if A("c") == nil
+if A.c == nil then   -- equivalent to if A("c") == nil
 ```
 
 Thus, unlike object oriented languages, `M.n` **_does not_** represent a variable or method `n` of object `M`.
