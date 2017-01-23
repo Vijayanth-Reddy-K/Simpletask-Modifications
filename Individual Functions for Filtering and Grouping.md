@@ -327,7 +327,7 @@ end
 If you sort by due date first, this results in something similar to the Any.Do layout, only, a lot more flexible, as you can define your own categories. If used in conjunction with one of the filter functions from the preceeding section, they would provide a header to the filter when opened in the main window.
 
 ```lua
-function onFilter(t, f, e)
+function onGroup(t, f, e)
     return group_uncompleted_by_due_date(t, f, e)
 end
 ```
