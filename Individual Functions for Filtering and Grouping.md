@@ -333,7 +333,7 @@ If there is no filter, the first two entries in the sort order must be `V Comple
 
 ```lua
 function onGroup(t, f, e)
-    return group_by_due_date(t, f, e)(t, f, e)
+    return group_by_due_date(t, f, e)
 end
 ```
 
