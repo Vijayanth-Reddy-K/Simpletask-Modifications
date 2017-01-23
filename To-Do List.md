@@ -2,3 +2,11 @@
 - [x] Finish Tips
 - [ ] Create saved filters
 - [ ] Update issues
+
+
+- [ ] Notes
+- [ ] Finish Tips
+- [ ] Create saved filters
+- [ ] Update issues
+
+
