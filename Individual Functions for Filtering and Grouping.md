@@ -149,7 +149,7 @@ end
 ---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
 
 function filter_uncompleted_by_due_date(t, f, e, time_period)
-	--[[Filter uncompleted tasks by due date. Valid ranges are: 'overdue', 'today', 'this week' (next 6 days after today), 
+	--[[Filter UNCOMPLETED tasks by due date. Valid ranges are: 'overdue', 'today', 'this week' (next 6 days after today), 
 	    'this month' (next 3 weeks after this week), and 'someday' (sometime after the next 30 days, or no due date set)
 		Note that "this week" and "this month" are moving windows. They are calculated from the current day. 
 		Not from the Sunday, or the 1st of that month]]
@@ -195,8 +195,8 @@ end
 
 ---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
 
-function group_uncompleted_by_due_date(t, f, e)
-	--[[Group uncompleted tasks by due date. Output ranges are: 'Already Overdue!!!', 'Due Today', 
+function group_by_due_date(t, f, e)
+	--[[Group tasks by due date. Output ranges are: 'Already Overdue!!!', 'Due Today', 
 	    'Due in the rest of this Week' (next 6 days after today), 'Due in the remainder of this Month' (next 3 weeks after this week), 
 		and 'Can Afford to Procrastinate on these for now!' (sometime after the next 30 days, or no due date set)]]
 
@@ -215,15 +215,18 @@ function group_uncompleted_by_due_date(t, f, e)
         elseif curr_time+week < f.due and curr_time+month >= f.due and f.completed == false then
             return "Due in the remainder of this Month"
             
-        else
+        elseif f.completed == false then
             return "Can Afford to Procrastinate on these for now!"
+	    
+	else
+	    return "Completed Tasks"
         end
     
     elseif f.completed == false then
         return "Can Afford to Procrastinate on these for now!"
         
     else
-        return false
+        return "Completed Tasks"
     
     end
 end
@@ -326,9 +329,11 @@ end
 
 If you sort by due date first, this results in something similar to the Any.Do layout, only, a lot more flexible, as you can define your own categories. If used in conjunction with one of the filter functions from the preceeding section, they would provide a header to the filter when opened in the main window.
 
+If there is no filter, the first two entries in the sort order must be `V Completed` followed by `V By Due Date` in order to make the entries legible to follow.
+
 ```lua
 function onGroup(t, f, e)
-    return group_uncompleted_by_due_date(t, f, e)
+    return group_by_due_date(t, f, e)(t, f, e)
 end
 ```
 
