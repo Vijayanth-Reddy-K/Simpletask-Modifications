@@ -224,7 +224,7 @@ function group_by_due_date(t, f, e)
     
     elseif f.completed == false then
         return "Can Afford to Procrastinate on these for now!"
-                                        -- Task not complete, but also no due date present.
+                                      -- Task not complete, but also no due date present.
         
     else
         return "Completed Tasks"    
