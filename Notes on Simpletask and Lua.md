@@ -115,6 +115,8 @@ f.lists["@Understand"] = true
 
 The first list can be acceessed even by `f.lists.Test`. But because the second list starts with a "@", `f.lists.@Understanding` throws an error, while the explicit key declaration `f.lists["@Understand"]` still works. And if a task does not belong to the "@Test" list, `f.lists.Test` will have a value `false`.
 
+One could argue that it would be simpler to store the lists as a series of _values_ in the `f.lists` table, and hence available for access by simply  using `f.lists(1)`, `f.lists(2)` and so on. But the present method makes checking for whether or not a task has a particular key simpler. The return value is a boolean directly. Thus, filtering is easier, although grouping functions that require the name of the list or tag are slightly more complex. There is also a positive side effect. By storing the lists as keys, duplicate keys are eliminated. A task such as `Test dup. @A @A` will only have `A` as a list.
+
 Similarly for tags. Thus, you can filter for tasks of a particular list (or tag) by using:
 
 ```lua
