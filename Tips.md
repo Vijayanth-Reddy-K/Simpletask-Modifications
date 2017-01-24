@@ -1,4 +1,4 @@
-1. _Using saved filters in widgets. Creating filter shortcuts. Widget portability across devices._  
+1. **_Using saved filters in widgets. Creating filter shortcuts. Widget portability across devices._**  
  
  From [here](https://github.com/mpcjanssen/simpletask-android/issues/507): 
 
@@ -10,14 +10,14 @@
  
  In order to create the same widgets across devices, export the filters. They will be saved as `saved_filters.txt` in the data folder. Similarly, export the Lua configuration. Copy both to new device, import them both, and use the above method to create the same widgets.
 
-2. _Editing the todo.txt file from within the Simpletask app._  
+2. **_Editing the todo.txt file from within the Simpletask app._**
 
  From [here](https://github.com/mpcjanssen/simpletask-android/issues/494). 
  > This is almost possible with File Order sort -> select all -> edit. You can successfully re-order lines (although it is difficult to add new lines in the middle); The only thing that's missing is white space.  
 
  Edit: It is not difficult to add lines in the middle. If there is any problem, try the [Hacker's keyboard](https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard&hl=en).
 
-3. _Understanding recurring and hidden tasks. The complete ramifications of using_ `rec:` _and_ `h:1`_._
+3. **_Understanding recurring and hidden tasks. The complete ramifications of using_  `rec:`  _and_  `h:1`_._**
 
  First, read the descriptions provided [here](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/index.en.md#extensions).  
 
@@ -45,7 +45,7 @@
 	
 	  `h:1 Persistent Lists: @A @B @C` and `h:1 Persistent Tags: +Z +Y +X` can be included.
  
-4. _Due Date, Threshold Date and Create is Threshold._
+4. _**Due Date, Threshold Date and Create is Threshold.**_
 
  Format for due and threshold dates provided [here](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/index.en.md#extensions).  
 
