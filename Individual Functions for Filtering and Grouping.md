@@ -17,7 +17,7 @@ function onGroup(t, f, e)
 end
 ```
 
-This generic tool will then group all tasks according to the return value, which will be the parameter in question. For example, if you wish to know what `f.due` is, simply use:
+This generic script will then group all tasks according to the return value, which will be the parameter in question. For example, if you wish to know what `f.due` is, simply use:
 
 ```lua
 function onGroup(t, f, e)
@@ -25,7 +25,7 @@ function onGroup(t, f, e)
 end
 ```
 
-This will group the tasks according to the internal representation of the due date, which is a large number (~10 to 11 digits).
+This will group the tasks according to the internal representation of the due date, which is a large number (~10 to 11 digits) (representing the due date in seconds).
 
 Some examples use `os.time()`. To understand what `os.time()` returns, instead of `f.due`, use `os.time()` in the above example. And to know exactly what the due or threshold or creation dates and times are for the corresponding internal representations stored in `f.due`, etc., use:
 
@@ -75,7 +75,7 @@ end
 
 will show all the keys and associated field values of the table `f.lists` (see the [Notes on Simpletask and Lua](Notes on Simpletask and Lua.md) file for details on keys and values).
 
-Similarly, replacing `f.lists` in `for k, v in pairs(f.lists) do` with `f.tags` or `e` show the tag keys and extension fields associated with the task. (This was done because the Simpletask Lua Help manual does not describe exactly what the extensions are.)
+Similarly, replacing `f.lists` in `for k, v in pairs(f.lists) do` with `f.tags` or `e` show the key:value pairs in the tags and extension tables respectively which are associated with the task. (This was done because the Simpletask Lua Help manual does not describe exactly what the extensions are.)
 
 
 
@@ -142,7 +142,8 @@ function multigroup_by_list_or_tag(t, f, e, parameter)
     elseif L == 1 then
         return next(tbl)	-- One list/tag. Return that value. Adapted from built-in example code.
     
-    else return sort_and_concatenate_keys(tbl)	-- Multiple lists/tags. Group under multiline label.
+    else 
+        return sort_and_concatenate_keys(tbl)	-- Multiple lists/tags. Group under multiline label.
     end
 end
 
@@ -164,7 +165,7 @@ function filter_uncompleted_by_due_date(t, f, e, time_period)
         if f.due ~= nil then
             return curr_time-day >= f.due and f.completed == false
         end
-        return false;
+        return false;    -- No due date specified. So do not display the task.
         
     elseif time_period == 'today' then
         if f.due ~= nil then
@@ -188,8 +189,7 @@ function filter_uncompleted_by_due_date(t, f, e, time_period)
         return f.completed == false and (curr_time+month < f.due or f.due == nil)
         
     else
-        return false -- No valid time range given.
-    
+        return false     -- No valid time range given.
     end
 end
 
@@ -219,15 +219,15 @@ function group_by_due_date(t, f, e)
             return "Can Afford to Procrastinate on these for now!"
 	    
 	else
-	    return "Completed Tasks"
+	    return "Completed Tasks"    -- f.completed is true implies task is completed,
         end
     
     elseif f.completed == false then
         return "Can Afford to Procrastinate on these for now!"
+                                        -- Task not complete, but also no due date present.
         
     else
-        return "Completed Tasks"
-    
+        return "Completed Tasks"    
     end
 end
 
@@ -287,6 +287,10 @@ function onGroup(t, f, e)
 end
 ```
 
+This was written primarily becase Simpletask does not handle multiple lists or tags assigned to the same task well.
+
+Note that in order to also sort the tasks properly once they are grouped this way, it is advisable to have as the first two entries of the sort order: `V Completed` followed by `V By List` if grouping by multiple lists and `V Completed` followed by `V By Tag` if grouping by multiple tags.
+
 ### Filter uncompleted tasks by due date
 
 ```lua
@@ -327,7 +331,7 @@ end
 
 ### Group uncompleted tasks by due date (as shown in filters defined in the previous section)
 
-If you sort by due date first, this results in something similar to the Any.Do layout, only, a lot more flexible, as you can define your own categories. If used in conjunction with one of the filter functions from the preceeding section, they would provide a header to the filter when opened in the main window.
+This results in something similar to the Any.Do layout, only, a lot more flexible, as you can define your own categories. If used in conjunction with one of the filter functions from the preceeding section, they would provide a header to the filter when opened in the main window.
 
 If there is no filter, the first two entries in the sort order must be `V Completed` followed by `V By Due Date` in order to make the entries legible to follow.
 
