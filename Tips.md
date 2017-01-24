@@ -1,5 +1,8 @@
-1. From [here](https://github.com/mpcjanssen/simpletask-android/issues/507): _Using saved filters in widgets. Creating flter shortcuts. Widget portability across devices._  
-> For now easiest way to achieve this is to select the filter in the app and then create the widget. it will pre fill with the current filter.  
+1. _Using saved filters in widgets. Creating filter shortcuts. Widget portability across devices._  
+ 
+ From [here](https://github.com/mpcjanssen/simpletask-android/issues/507): 
+
+ > For now easiest way to achieve this is to select the filter in the app and then create the widget. it will pre fill with the current filter.  
 
  You can define a lua script as well as custom sorting and filters and then save the filter to the right drawer. All the app filters, options, sort order, and entries in the script window will be stored. Thus, if you wish to exclude certain lists or tags, for example, you can do that without using Lua. Once you have all predefined filters stored this way, in order to create a widget with a particular filter, just select that filter in the main app. Then, click on the home screen (do not close the filter (with back button if the option is enabled) or hitting `X`) and create a new Simpletask widget. The last opened filter will be used automatically.  
  
@@ -7,12 +10,16 @@
  
  In order to create the same widgets across devices, export the filters. They will be saved as `saved_filters.txt` in the data folder. Similarly, export the Lua configuration. Copy both to new device, import them both, and use the above method to create the same widgets.
 
-2. From [here](https://github.com/mpcjanssen/simpletask-android/issues/494). _Editing the todo.txt file from within the Simpletask app._  
-> This is almost possible with File Order sort -> select all -> edit. You can successfully re-order lines (although it is difficult to add new lines in the middle); The only thing that's missing is white space.  
+2. _Editing the todo.txt file from within the Simpletask app._  
+
+ From [here](https://github.com/mpcjanssen/simpletask-android/issues/494). 
+ > This is almost possible with File Order sort -> select all -> edit. You can successfully re-order lines (although it is difficult to add new lines in the middle); The only thing that's missing is white space.  
 
  Edit: It is not difficult to add lines in the middle. If there is any problem, try the [Hacker's keyboard](https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard&hl=en).
 
-3. Understanding recurring and hidden tasks. The complete ramifications of using `rec:` and `h:1`. First, read the descriptions provided [here](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/index.en.md#extensions).  
+3. _Understanding recurring and hidden tasks. The complete ramifications of using_ `rec:` _and_ `h:1`_._
+
+ First, read the descriptions provided [here](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/index.en.md#extensions).  
 
  - **Recurring Tasks**: When you set up a recurring task, once it is completed, the _existing task_ is marked as done and a _new task_ is created. The lists, tags, priority and task description in the new task are same as the one in the old task. The due and threshold dates and creation date (if any) change however. How they change depends on the kind of recurrence behaviour. Below, we explore the difference between `rec:+1d` (calculate from original dates) and `rec:1d`(calculate from completion date).   
    
@@ -38,7 +45,9 @@
 	
 	  `h:1 Persistent Lists: @A @B @C` and `h:1 Persistent Tags: +Z +Y +X` can be included.
  
-4. **Due Date, Threshold Date and Create is Threshold**: Format for due and threshold dates provided [here](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/index.en.md#extensions).  
+4. _Due Date, Threshold Date and Create is Threshold._
+
+ Format for due and threshold dates provided [here](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/index.en.md#extensions).  
 
  Due date defines when the task is due. Threshold date defines when the task is supposed to begin. The date of creation of the task is not necessarily the date the task needs to begin.  
 	
