@@ -461,27 +461,6 @@ Listed below is my exported saved filters list. To use, copy this into the Simpl
 
 ```
 {
-  "00. Simpletask Default (With Test Script)": {
-    "HIDETAGS": false,
-    "query": "",
-    "LUASCRIPT": "",
-    "HIDEHIDDEN": true,
-    "PROJECTSnot": false,
-    "CONTEXTSnot": false,
-    "HIDECREATEDATE": false,
-    "LUASCRIPT_TEST_TASK": "x 2017-02-02 (A) 2016-12-15 This is an example task with all features. @Testing @@Understanding_ST +Help ++Manual t:2016-12-15 due:2016-12-22 rec:+1d h:1",
-    "HIDELISTS": false,
-    "USE_SCRIPT": false,
-    "CONTEXTS": "",
-    "PRIORITIES": "",
-    "CREATEISTHRESHOLD": false,
-    "HIDEFUTURE": false,
-    "HIDECOMPLETED": false,
-    "SORTS": "+!completed\n+!by_context\n+!by_prio\n+!by_project\n+!by_due_date\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
-    "PROJECTS": "",
-    "PRIORITIESnot": false,
-    "TITLE": "00. Simpletask Default (With Test Script)"
-  },
   "13. Any.do Layout - Pending Tasks only (No Health)": {
     "HIDETAGS": false,
     "query": "",
@@ -608,6 +587,27 @@ Listed below is my exported saved filters list. To use, copy this into the Simpl
     "PRIORITIESnot": false,
     "TITLE": "09. Completed (Non-Recurring Only)"
   },
+  "00. Welcome Message": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "msg_no = math.random (1, tablelength(welc_msgs))\r\ntoast('Today is: '..os.date(\"%A, %B %d, %Y.\", os.time ())..'\\n\\n'..welc_msgs[msg_no])\r\ntoast('Today is: '..os.date(\"%A, %B %d, %Y.\", os.time ())..'\\n\\n'..welc_msgs[msg_no])\r\ntoast('Today is: '..os.date(\"%A, %B %d, %Y.\", os.time ())..'\\n\\n'..welc_msgs[msg_no])\r\n \nfunction onFilter(t,f,e)\n    return false\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": false,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_context\n+!by_prio\n+!by_project\n+!by_due_date\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "00. Welcome Message"
+  },
   "03. Rest of this Week (No Health)": {
     "HIDETAGS": false,
     "query": "",
@@ -628,6 +628,27 @@ Listed below is my exported saved filters list. To use, copy this into the Simpl
     "PROJECTS": "",
     "PRIORITIESnot": false,
     "TITLE": "03. Rest of this Week (No Health)"
+  },
+  "14. Simpletask Default (With Test Script)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": false,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "x 2017-02-02 (A) 2016-12-15 This is an example task with all features. @Testing @@Understanding_ST +Help ++Manual t:2016-12-15 due:2016-12-22 rec:+1d h:1",
+    "HIDELISTS": false,
+    "USE_SCRIPT": false,
+    "CONTEXTS": "",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_context\n+!by_prio\n+!by_project\n+!by_due_date\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "14. Simpletask Default (With Test Script)"
   },
   "04. Rest of this Month (No Health)": {
     "HIDETAGS": false,
