@@ -75,7 +75,7 @@ end
 
 will show all the keys and associated field values of the table `f.lists` (see the [Notes on Simpletask and Lua](Notes on Simpletask and Lua.md) file for details on keys and values).
 
-Similarly, replacing `f.lists` in `for k, v in pairs(f.lists) do` with `f.tags` or `e` show the key:value pairs in the tags and extension tables respectively which are associated with the task. (This was done because the Simpletask Lua Help manual does not describe exactly what the extensions are.)
+Similarly, replacing `f.lists` in `for k, v in pairs(f.lists) do` with `f.tags` or `e` show the key:value pairs in the tags and extension tables respectively which are associated with the task. (This script was written because the Simpletask Lua Help manual does not describe exactly what the extensions are, and I wanted to find them out. I later discovered that the [main help page](https://github.com/mpcjanssen/simpletask-android/blob/master/src/main/assets/index.en.md#extensions) does mention that due, h, etc. are the extensions and I did not realise it. It is still fun to watch the extensions being listed however. :smile:)
 
 
 
@@ -84,10 +84,8 @@ Similarly, replacing `f.lists` in `for k, v in pairs(f.lists) do` with `f.tags` 
 This is the Lua Config file I have at present. The functions defined are heavily commented, so no separate descriptions are provided.
 
 ```lua
-toast('Hello')    -- Welcome message. Runs every time Simpletask starts or the lua configuration script is run.
-
 ---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
--- BACKGROUND FUNCTIONS Needed for the functions defined under GROUPING AND FILTERING section
+-- BACKGROUND FUNCTIONS Needed for the functions defined under WELCOME and GROUPING AND FILTERING sections
 ---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
 
 function tablelength(T)
@@ -122,6 +120,26 @@ function sort_and_concatenate_keys(T)
 end
 
 ---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
+-- WELCOME MESSAGE: Announce date and a random message from table. Insert messages below or modify existing ones as shown.
+---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
+
+welc_msgs = {}
+    -- Table constructor. Do not modify. Insert new messages below using syntax: welc_msgs[#] = "message"
+
+welc_msgs[1] = "Hello!"
+welc_msgs[2] = "Seize the day!"
+welc_msgs[3] = "Carpe diem!"
+welc_msgs[4] = "Today is your day!"
+welc_msgs[5] = "Make the day count!"
+welc_msgs[6] = "Make the night count!"
+
+msg_no = math.random (1, tablelength(welc_msgs))
+toast('Today is: '..os.date("%A, %B %d, %Y.", os.time ())..'\n\n'..welc_msgs[msg_no])
+toast('Today is: '..os.date("%A, %B %d, %Y.", os.time ())..'\n\n'..welc_msgs[msg_no])
+toast('Today is: '..os.date("%A, %B %d, %Y.", os.time ())..'\n\n'..welc_msgs[msg_no])
+    -- Welcome message. Runs every time Simpletask starts afresh or the lua configuration script is run. Repeated thrice for persistence.
+
+---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
 -- GROUPING AND FILTERING FUNCTIONS: Group by due date or list or tag
 ---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
 
@@ -149,85 +167,134 @@ end
 
 ---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
 
-function filter_uncompleted_by_due_date(t, f, e, time_period)
-	--[[Filter UNCOMPLETED tasks by due date. Valid ranges are: 'overdue', 'today', 'this week' (next 6 days after today), 
+function filter_by_date(t, f, e, time_period, date_to_be_used)
+	--[[Filter tasks by date. 
+	    Valid ranges for time_period are: 'over' (already past), 'today', 'this week' (next 6 days after today), 
 	    'this month' (next 3 weeks after this week), and 'someday' (sometime after the next 30 days, or no due date set)
 		Note that "this week" and "this month" are moving windows. They are calculated from the current day. 
-		Not from the Sunday, or the 1st of that month]]
+		Not from the Sunday, or the 1st of that month.
+		
+	    Valid options for date_to_be_used are: 'creation', 'completion', 'due', 'threshold']]
 
     local curr_time, day, week, month = os.time(), 86400, 518400, 2505600
 		--[[As f.due, os.time(), etc. return values in seconds:
 				86400: Number of seconds in a day
 				518400: Number of seconds in six days
 				2505600: Number of seconds in 29 days (assuming a 30 day month)]]
+				
+    if date_to_be_used == 'creation' then
+        use_date = f.createdate
+	
+    elseif date_to_be_used == 'completion' then
+        use_date = f.completiondate
+	
+    elseif date_to_be_used == 'due' then
+        use_date = f.due
+	
+    elseif date_to_be_used == 'threshold' then
+        use_date = f.threshold
+	
+    else
+        return false  -- Invalid date option. So no tasks to display.
+    end
     
-    if time_period == 'overdue' then
-        if f.due ~= nil then
-            return curr_time-day >= f.due and f.completed == false
+    if time_period == 'over' then
+        if use_date ~= nil then
+            return curr_time-day >= use_date
         end
-        return false;    -- No due date specified. So do not display the task.
+        return false;    -- No due/threshold/creation/completion date specified. So do not display the task.
         
     elseif time_period == 'today' then
-        if f.due ~= nil then
-            return curr_time >= f.due and curr_time-day < f.due and f.completed == false
+        if use_date ~= nil then
+            return curr_time >= use_date and curr_time-day < use_date
         end
         return false;
         
     elseif time_period == 'this week' then
-        if f.due ~= nil then
-            return curr_time < f.due and curr_time+week >= f.due and f.completed == false
+        if use_date ~= nil then
+            return curr_time < use_date and curr_time+week >= use_date
         end
         return false;
         
     elseif time_period == 'this month' then
-        if f.due ~= nil then
-            return curr_time+week < f.due and curr_time+month >= f.due and f.completed == false
+        if use_date ~= nil then
+            return curr_time+week < use_date and curr_time+month >= use_date
         end
         return false;
         
     elseif time_period == 'someday' then
-        return f.completed == false and (curr_time+month < f.due or f.due == nil)
+        return curr_time+month < use_date or use_date == nil
         
     else
-        return false     -- No valid time range given.
+        return false     -- No valid time range given. So no tasks to display.
     end
 end
 
 ---------------------------------- ---------------------------------- ---------------------------------- ----------------------------------
 
-function group_by_due_date(t, f, e)
-	--[[Group tasks by due date. Output ranges are: 'Already Overdue!!!', 'Due Today', 
-	    'Due in the rest of this Week' (next 6 days after today), 'Due in the remainder of this Month' (next 3 weeks after this week), 
-		and 'Can Afford to Procrastinate on these for now!' (sometime after the next 30 days, or no due date set)]]
+function group_by_date(t, f, e, date_to_be_used)
+	--[[Group tasks by date. 
+	    Output ranges are: 'Already Overdue!!!' (etc, depending on date used), '...Today', 
+	    '...in the rest of this Week' (next 6 days after today), '...in the remainder of this Month' (next 3 weeks after this week), 
+		and 'Can Afford to Procrastinate on these for now!' (sometime after the next 30 days, or no specified date set)
+		
+	    Valid options for date_to_be_used are: 'creation', 'due', 'threshold'
+	    Completion date is not used here as completed tasks are generally archived or deleted on a weekly basis.]]
 
     local curr_time, day, week, month = os.time(), 86400, 518400, 2505600	-- See above for details.
     
-    if f.due ~= nil then
-        if curr_time-day >= f.due and f.completed == false then
-            return "Already Overdue!!!"
-            
-        elseif curr_time >= f.due and curr_time-day < f.due and f.completed == false then
-            return "Due Today"
-        
-        elseif curr_time < f.due and curr_time+week >= f.due and f.completed == false then
-            return "Due in the rest of this Week"
-        
-        elseif curr_time+week < f.due and curr_time+month >= f.due and f.completed == false then
-            return "Due in the remainder of this Month"
-            
-        elseif f.completed == false then
-            return "Can Afford to Procrastinate on these for now!"
-	    
-	else
-	    return "Completed Tasks"    -- f.completed is true implies task is completed,
-        end
-    
-    elseif f.completed == false then
-        return "Can Afford to Procrastinate on these for now!"
-                                        -- Task not complete, but also no due date present.
-        
+    if date_to_be_used == 'creation' then
+        use_date = f.createdate
+	overdue_string = "Creation Date is in the past"
+	leading_string = "Created "
+	someday_string = "Creation Date more than 30 days from now"
+	no_date_string = "No Creation Date specified"
+	
+    elseif date_to_be_used == 'due' then
+        use_date = f.due
+	overdue_string = "Already Overdue!!!"
+	leading_string = "Due "
+	someday_string = "Can Afford to Procrastinate on these for now!"
+	no_date_string = "Can Afford to Procrastinate on these for now!"
+	
+    elseif date_to_be_used == 'threshold' then
+        use_date = f.threshold
+	overdue_string = "Threshold Date is in the past"
+	leading_string = "Started "
+	someday_string = "Threshold Date more than 30 days from now"
+	no_date_string = "No Threshold Date specified"
+	
     else
-        return "Completed Tasks"    
+        use_date = f.due
+	overdue_string = "Invalid Date Option. Grouping by due date as default."
+	leading_string = "Invalid Date Option. Grouping by due date as default."
+	someday_string = "Invalid Date Option. Grouping by due date as default."
+	no_date_string = "Invalid Date Option. Grouping by due date as default."
+	    -- Invalid date option. Inform user of it and group by due date.
+    end
+    
+    if f.completed == false then
+        if use_date ~= nil then
+            if curr_time-day >= use_date then
+                return overdue_string
+                
+            elseif curr_time >= use_date and curr_time-day < use_date then
+                return leading_string.."Today: "..os.date("%A, %B %d, %Y", curr_time)
+                
+            elseif curr_time < use_date and curr_time+week >= use_date then
+                return leading_string.."in the rest of this Week"
+                
+            elseif curr_time+week < use_date and curr_time+month >= use_date then
+                return leading_string.."in the remainder of this Month"
+            
+            else
+                return someday_string  -- use_date greater than 30 days from today
+	    end
+	else
+	    return no_date_string  -- no use_date present
+	end
+    else
+	return "Completed Tasks"    -- f.completed is true implies task is completed,
     end
 end
 
@@ -270,6 +337,32 @@ function onFilter(t, f, e)
 end
 ```
 
+(The option to show completed tasks must be checked in the `OTHER` tab.)
+
+### Show only hidden tasks
+
+```lua
+function onFilter(t, f, e)
+    return e.h ~= nil
+end
+```
+
+(The option to show hidden tasks must be checked in the `OTHER` tab.)
+
+### Show only recurring tasks
+
+```lua
+function onFilter(t, f, e)
+    return e.rec ~= nil
+end
+
+-- OR
+
+function onFilter(t, f, e)
+    return f.recurrence ~= nil
+end
+```
+
 ### Group tasks by list or tag, even those with multiple of them in a single task. Such tasks are classified separately.
 
 ```lua
@@ -289,47 +382,60 @@ end
 
 This was written primarily becase Simpletask does not handle multiple lists or tags assigned to the same task well.
 
-Note that in order to also sort the tasks properly once they are grouped this way, it is advisable to have as the first two entries of the sort order: `V Completed` followed by `V By List` if grouping by multiple lists and `V Completed` followed by `V By Tag` if grouping by multiple tags.
+Note that in order to also sort the tasks properly once they are grouped this way, it is advisable to have as the first two entries of the sort order: `V Completed` followed by `V By List` if grouping by multiple lists and `V Completed` followed by `V By Tag` if grouping by multiple tags. If you select not to display completed tasks (from the `OTHER` tab), then the first entry needn't be `V Completed`.
 
-### Filter uncompleted tasks by due date
+### Filter tasks by due date
 
 ```lua
 -- Filter by due date: Overdue
 
 function onFilter(t, f, e)
-    return filter_uncompleted_by_due_date(t, f, e, "overdue")
+    return filter_by_date(t, f, e, "over", "due")
 end
 
 
 -- Filter by due date: Due today
 
 function onFilter(t, f, e)
-    return filter_uncompleted_by_due_date(t, f, e, "today")
+    return filter_by_date(t, f, e, "today", "due")
 end
 
 
 -- Filter by due date: Due in the next seven days, excluding today
 
 function onFilter(t, f, e)
-    return filter_uncompleted_by_due_date(t, f, e, "this week")
+    return filter_by_date(t, f, e, "this week", "due")
 end
 
 
 -- Filter by due date: Due in the next thirty days, excluding this week
 
 function onFilter(t, f, e)
-    return filter_uncompleted_by_due_date(t, f, e, "this month")
+    return filter_by_date(t, f, e, "this month", "due")
 end
 
 
 -- Filter by due date: Due after the next 30 days (including today), or no due date set
 
 function onFilter(t, f, e)
-    return filter_uncompleted_by_due_date(t, f, e, "someday")
+    return filter_by_date(t, f, e, "someday", "due")
 end
 ```
 
-### Group uncompleted tasks by due date (as shown in filters defined in the previous section)
+Similarly, if you wish to filter by threshold date or completion date or creation date, use `"threshold"`, `"completion"`, or `"creation"` respectively in pace of `due` in the scripts above.
+
+An earlier iteration of this function filtered out completed tasks. If you wish to display only uncompleted tasks, the scripts above need to be modified to:
+
+```lua
+function onFilter(t, f, e)
+    return filter_by_date(t, f, e, <relevant time period option>, <relevant date option>) and f.completed == false
+        -- ..and f.completed == true for showing only completed tasks
+end
+```
+
+In case of hiding completed tasks, you could also use the function `filter_by_date` while unchecking the option to show completed tasks in the `OTHER` tab. Save it as a filter for quick access. (See [here](https://github.com/Vijayanth-Reddy-K/Simpletask-Modifications/blob/Add-Code/Individual%20Functions%20for%20Filtering%20and%20Grouping.md#saved-filters) for more on this.)
+
+### Group tasks by due date (as shown in filters defined in the previous section)
 
 This results in something similar to the Any.Do layout, only, a lot more flexible, as you can define your own categories. If used in conjunction with one of the filter functions from the preceeding section, they would provide a header to the filter when opened in the main window.
 
@@ -337,9 +443,11 @@ If there is no filter, the first two entries in the sort order must be `V Comple
 
 ```lua
 function onGroup(t, f, e)
-    return group_by_due_date(t, f, e)
+    return group_by_date(t, f, e, "due")
 end
 ```
+
+You can group by threshold or creation dates by using `"threshold"` and `"creation"` respectively instead of `"due"`.
 
 Note that `onGroup`function return values only show up when you open Simpletask. Not in widgets, as of now.
 
@@ -347,9 +455,307 @@ Note that `onGroup`function return values only show up when you open Simpletask.
 
 # Saved Filters
 
-These filters use a combination of Lua scripts and sorting and conventional filtering options to give diverse results. They appear in the right drawer. The Lua scripts themselves use a combination of the filtering and grouping finctions displayed above as needed.
+Tasks can be filtered and grouped using a combination of Lua scripts and conventional Simpletask filters and other options (literally `OTHER` options). Any such combination can be saved by using the right drawer. Once saved, all of the saved settings are applied when you select the saved filter. The saved filters can be exported and used across devices. For more details, see [Tips.md](https://github.com/Vijayanth-Reddy-K/Simpletask-Modifications/blob/Add-Code/Tips.md)
 
+Listed below is my exported saved filters list. To use, copy this into the Simpletask data directory in a text file named `saved_filters.txt` and import using the right drawer.
 
-
+```
+{
+  "00. Simpletask Default (With Test Script)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": false,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "x 2017-02-02 (A) 2016-12-15 This is an example task with all features. @Testing @@Understanding_ST +Help ++Manual t:2016-12-15 due:2016-12-22 rec:+1d h:1",
+    "HIDELISTS": false,
+    "USE_SCRIPT": false,
+    "CONTEXTS": "",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_context\n+!by_prio\n+!by_project\n+!by_due_date\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "00. Simpletask Default (With Test Script)"
+  },
+  "13. Any.do Layout - Pending Tasks only (No Health)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onGroup(t, f, e)\n    return group_by_date(t, f, e, \"due\")\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": true,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "Health",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": true,
+    "SORTS": "+!completed\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "13. Any.do Layout - Pending Tasks only (No Health)"
+  },
+  "12. Any.do Layout - All (No Health)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onGroup(t, f, e)\n    return group_by_date(t, f, e, \"due\")\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": true,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "Health",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "12. Any.do Layout - All (No Health)"
+  },
+  "11. Any.do Layout - All": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onGroup(t, f, e)\n    return group_by_date(t, f, e, \"due\")\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": false,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "11. Any.do Layout - All"
+  },
+  "02. Today (No Health)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    return filter_by_date(t, f, e, \"today\", \"due\")\nend\n\nfunction onGroup(t, f, e)\n    return group_by_date(t, f, e, \"due\")\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": true,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "Health",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": true,
+    "SORTS": "+!completed\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "02. Today (No Health)"
+  },
+  "10. Hidden (All)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    return e.h ~= nil\nend\n",
+    "HIDEHIDDEN": false,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": false,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_completion_date\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "10. Hidden (All)"
+  },
+  "09. Completed (Non-Recurring Only)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    return e.rec == nil and f.completed\nend\n",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": false,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_completion_date\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "09. Completed (Non-Recurring Only)"
+  },
+  "03. Rest of this Week (No Health)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    return filter_by_date(t, f, e, \"this week\", \"due\")\nend\n\nfunction onGroup(t, f, e)\n    return group_by_date(t, f, e, \"due\")\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": true,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "Health",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": true,
+    "SORTS": "+!completed\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "03. Rest of this Week (No Health)"
+  },
+  "04. Rest of this Month (No Health)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    return filter_by_date(t, f, e, \"this month\", \"due\")\nend\n\nfunction onGroup(t, f, e)\n    return group_by_date(t, f, e, \"due\")\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": true,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "Health",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": true,
+    "SORTS": "+!completed\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "04. Rest of this Month (No Health)"
+  },
+  "06. Health (Pending: Overdue and Today, Completed: Today)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    if f.completed ==  true then\n        return filter_by_date(t, f, e, \"today\", \"completion\")\n                -- Show tasks completed only today\n                -- (to undo in case any were marked completed by mistake)\n    else\n        return true  -- Show all uncompleted tasks\n    end\nend\n\nfunction onGroup(t, f, e)\n    return group_by_date(t, f, e, \"due\")\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": false,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "Health",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": true,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "06. Health (Pending: Overdue and Today, Completed: Today)"
+  },
+  "08. Completed (Recurring Only)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    return e.rec ~= nil and f.completed\nend\n",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": false,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_completion_date\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "08. Completed (Recurring Only)"
+  },
+  "01. Overdue (No Health)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    return filter_by_date(t, f, e, \"over\", \"due\")\nend\n\nfunction onGroup(t, f, e)\n    return group_by_date(t, f, e, \"due\")\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": true,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "Health",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": true,
+    "SORTS": "+!completed\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "01. Overdue (No Health)"
+  },
+  "07. Completed (All)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    return f.completed\nend\n",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": false,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": false,
+    "SORTS": "+!completed\n+!by_completion_date\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "07. Completed (All)"
+  },
+  "05. Someday (No Health)": {
+    "HIDETAGS": false,
+    "query": "",
+    "LUASCRIPT": "function onFilter(t, f, e)\n    return filter_by_date(t, f, e, \"someday\", \"due\")\nend\n\nfunction onGroup(t, f, e)\n    return group_by_date(t, f, e, \"due\")\nend",
+    "HIDEHIDDEN": true,
+    "PROJECTSnot": false,
+    "CONTEXTSnot": true,
+    "HIDECREATEDATE": false,
+    "LUASCRIPT_TEST_TASK": "",
+    "HIDELISTS": false,
+    "USE_SCRIPT": true,
+    "CONTEXTS": "Health",
+    "PRIORITIES": "",
+    "CREATEISTHRESHOLD": false,
+    "HIDEFUTURE": false,
+    "HIDECOMPLETED": true,
+    "SORTS": "+!completed\n+!by_due_date\n+!by_context\n+!by_prio\n+!by_project\n+!by_threshold_date\n+!alphabetical\n+!by_creation_date\n+!in_future\n+!by_completion_date\n+!file_order",
+    "PROJECTS": "",
+    "PRIORITIESnot": false,
+    "TITLE": "05. Someday (No Health)"
+  }
+}
+```
 
 
