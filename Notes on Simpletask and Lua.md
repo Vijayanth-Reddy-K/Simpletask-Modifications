@@ -139,9 +139,9 @@ function onFilter(t,f,e)
 end
 ```
 
-The `extensions` argument (`e` in the function calls) is also a table with some custom Simpletask specific terms (such as due and threshold date strings, and recurrence behaviour) as values, and corresponding custom keys referencing these values. If, instead of checking for the existence of individual tags or lists, you wish to list or concatenate all the lists or tags, the code for doing so can be found [here](https://github.com/Vijayanth-Reddy-K/Simpletask-Modifications/blob/Add-Code/Individual%20Functions%20for%20Filtering%20and%20Grouping.md#understanding-tables-generated-by-simpletask).
+The `extensions` argument (`e` in the function calls) is also a table with some custom Simpletask specific terms (such as due and threshold date strings, and recurrence behaviour) as values, and corresponding custom keys referencing these values. If, instead of checking for the existence of individual tags or lists, you wish to list or concatenate all the lists or tags, the code for doing so can be found [here](Individual Functions for Filtering and Grouping.md#understanding-tables-generated-by-simpletask).
 
-Note that if you wish to filter by lists or tags and also perform some additional functions, you can combine lua scripts with the in-built filters. (For more details, see [Tips](Tips.md))
+Note that if you wish to filter by lists or tags and also perform some additional functions, you can combine lua scripts with the in-built filters. (For more details, see [Tips](Tips.md).)
 
 # Appendix
 
