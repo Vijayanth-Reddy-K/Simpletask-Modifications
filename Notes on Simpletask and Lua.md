@@ -19,14 +19,14 @@ That is, unlike MATLAB, where an array can only have numerical indices, in lua, 
 ```lua
 A = {}        -- Empty Table
 
-A(1) = 2      -- Value of A at index 1 (number) is 2.
-A("1") = 5    -- Value of A at index 1 (string) is 5. (Note the index 1 is different from "1")
-A(3) = "t"    -- Value of A at index 3 (number) is string "t".
+A[1] = 2      -- Value of A at index 1 (number) is 2.
+A["1"] = 5    -- Value of A at index 1 (string) is 5. (Note the index 1 is different from "1")
+A[3] = "t"    -- Value of A at index 3 (number) is string "t".
 
 a = "b"
-A("a") = 6    -- Value of A at index "a" (string) is 6.
-A(a) = 5      -- Value of A at index a (which has the value "b", hence the index is string "b") is 5.
-A("b") = 8    -- Value of A at index "b" (string) is updated from 5 to 8.
+A["a"] = 6    -- Value of A at index "a" (string) is 6.
+A[a] = 5      -- Value of A at index a (which has the value "b", hence the index is string "b") is 5.
+A["b"] = 8    -- Value of A at index "b" (string) is updated from 5 to 8.
 ```
 
 At the end of this set of statements, A is a table with 5 elements at indices 1, "1", 3, "a" and "b". As shown in the above example, the indices need not be sequential.
@@ -35,6 +35,8 @@ The indices of the table are also called *keys* and each key has an associated _
 
 Thus, in table `A`, at the `key` "b", the `value` is 8.
 
+Also note that you access values of a table by enclosing the key within `[]` brackets. A function call on the other hand uses `()` brackets.
+
 As mentioned earlier,
 
 > Any key with value **nil** is not considered part of the table. Conversely, any key that is not part of a table has an associated value **nil**.
@@ -42,7 +44,7 @@ As mentioned earlier,
 Thus, to delete a value assigned to a key, simply assign it to `nil`. Thus, implementing this code:
 
 ```lua
-A("a") = nil
+A["a"] = nil
 ```
 
 will reduce the number of elements in table `A` to 4.
@@ -50,7 +52,7 @@ will reduce the number of elements in table `A` to 4.
 Also, if you wish to check whether or not a particular key is associated with a table, check whether or not it is equal to `nil`. For instance,
 
 ```lua
-if A("b") == nil then
+if A["b"] == nil then
     -- code
 end
 ```
@@ -66,11 +68,11 @@ What this means is in the code above, if the index/key were a string, a differen
 Thus,
 
 ```lua
-A.a = 5         -- equivalent to A("a") = 5
-A.b = 4         -- equivalent to A("b") = 4
-A.1 = 3         -- equivalent to A("1") = 3
+A.a = 5         -- equivalent to A["a"] = 5
+A.b = 4         -- equivalent to A["b"] = 4
+A.1 = 3         -- equivalent to A["1"] = 3
 
-if A.c == nil then   -- equivalent to if A("c") == nil
+if A.c == nil then   -- equivalent to if A["c"] == nil
 ```
 
 Thus, unlike object oriented languages, `M.n` **_does not_** represent a variable or method `n` of object `M`.
@@ -115,7 +117,7 @@ f.lists["@Understand"] = true
 
 The first list can be acceessed even by `f.lists.Test`. But because the second list starts with a "@", `f.lists.@Understanding` throws an error, while the explicit key declaration `f.lists["@Understand"]` still works. And if a task does not belong to the "@Test" list, `f.lists.Test` will have a value `false`.
 
-One could argue that it would be simpler to store the lists as a series of _values_ in the `f.lists` table, and hence available for access by simply  using `f.lists(1)`, `f.lists(2)` and so on. But the present method makes checking for whether or not a task has a particular key simpler. The return value is a boolean directly. Thus, filtering is easier, although grouping functions that require the name of the list or tag are slightly more complex. There is also a positive side effect. By storing the lists as keys, duplicate keys are eliminated. A task such as `Test dup. @A @A` will only have `A` as a list.
+One could argue that it would be simpler to store the lists as a series of _values_ in the `f.lists` table, and hence available for access by simply  using `f.lists[1]`, `f.lists[2]` and so on. But the present method makes checking for whether or not a task has a particular key simpler. The return value is a boolean directly. Thus, filtering is easier, although grouping functions that require the name of the list or tag are slightly more complex. There is also a positive side effect. By storing the lists as keys, duplicate keys are eliminated. A task such as `Test dup. @A @A` will only have `A` as a list.
 
 Similarly for tags. Thus, you can filter for tasks of a particular list (or tag) by using:
 
